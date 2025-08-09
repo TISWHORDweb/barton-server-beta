@@ -4,7 +4,6 @@ const {
   getContacts,
   getContact,
   updateContact,
-  addNote,
   deleteContact,
   getContactStats
 } = require('../controllers/contactController');
@@ -29,7 +28,5 @@ router.route('/:id')
   .put(updateContact)
   .delete(deleteContact);
 
-router.route('/:id/notes')
-  .post(addNote);
 
 module.exports = router;

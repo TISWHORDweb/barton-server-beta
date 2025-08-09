@@ -7,13 +7,14 @@ const { validateContact } = require('../utils/validation');
 // @access  Public
 exports.submitContact = async (req, res) => {
   try {
-    const { error, value } = validateContact(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.details[0].message
-      });
-    }
+    // const { error, value } = validateContact(req.body);
+    // if (error) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: error.details[0].message
+    //   });
+    // }
+    const value = req.body
 
     // Add metadata
     value.ipAddress = req.ip;
@@ -28,12 +29,12 @@ exports.submitContact = async (req, res) => {
       console.error('Contact confirmation email failed:', emailError);
     }
 
-    // Send notification to admins
-    try {
-      await emailService.sendContactNotification(contact);
-    } catch (emailError) {
-      console.error('Contact notification email failed:', emailError);
-    }
+    // // Send notification to admins
+    // try {
+    //   await emailService.sendContactNotification(contact);
+    // } catch (emailError) {
+    //   console.error('Contact notification email failed:', emailError);
+    // }
 
     res.status(201).json({
       success: true,
@@ -147,7 +148,7 @@ exports.updateContact = async (req, res) => {
       });
     }
 
-    const allowedFields = ['status', 'priority', 'assignedTo'];
+    const allowedFields = ['status'];
     const updateData = {};
     
     Object.keys(req.body).forEach(key => {
@@ -163,48 +164,6 @@ exports.updateContact = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: contact
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message
-    });
-  }
-};
-
-// @desc    Add note to contact
-// @route   POST /api/contacts/:id/notes
-// @access  Private (Admin)
-exports.addNote = async (req, res) => {
-  try {
-    const contact = await Contact.findById(req.params.id);
-
-    if (!contact) {
-      return res.status(404).json({
-        success: false,
-        message: 'Contact not found'
-      });
-    }
-
-    if (!req.body.note || req.body.note.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Note content is required'
-      });
-    }
-
-    contact.notes.push({
-      user: req.user.id,
-      note: req.body.note.trim()
-    });
-
-    await contact.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Note added successfully',
       data: contact
     });
   } catch (error) {
