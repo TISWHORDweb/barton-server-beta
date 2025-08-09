@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const emailService = require('../services/emailService');
 const { validateRegister, validateLogin } = require('../utils/validation');
+const sha1 = require('sha1');
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -47,6 +48,7 @@ exports.register = async (req, res, next) => {
     }
 
     const { firstName, lastName, email, password } = value;
+    const hashPassword = sha1(password);
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -62,15 +64,15 @@ exports.register = async (req, res, next) => {
       firstName,
       lastName,
       email,
-      password
+      password: hashPassword
     });
 
     // Send welcome email
-    try {
-      await emailService.sendWelcomeEmail(user);
-    } catch (emailError) {
-      console.error('Welcome email failed:', emailError);
-    }
+    // try {
+    //   await emailService.sendWelcomeEmail(user);
+    // } catch (emailError) {
+    //   console.error('Welcome email failed:', emailError);
+    // }
 
     sendTokenResponse(user, 201, res);
   } catch (error) {
@@ -97,14 +99,19 @@ exports.login = async (req, res, next) => {
 
     const { email, password } = value;
 
+    if (!password) {
+      return res.status(400).json({ success: false, message: 'Password is required' });
+    }
+    const hashPassword = sha1(password);
     // Check for user and include password
     const user = await User.findOne({ email }).select('+password');
-    
-    if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+    if (!user) {
+      if (hashPassword !== user.password) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid credentials'
+        });
+      }
     }
 
     if (!user.isActive) {
@@ -133,7 +140,7 @@ exports.login = async (req, res, next) => {
 exports.getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    
+
     res.status(200).json({
       success: true,
       data: user
