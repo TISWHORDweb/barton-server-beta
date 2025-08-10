@@ -8,7 +8,6 @@ const newsletterSchema = new mongoose.Schema({
   excerpt: { type: String, maxlength: 500 },
   type: { type: String, enum: ['photos', 'press', 'videos', 'general'], default: 'general', required: true },
   featuredImage: String,
-  gallery: [{ url: String, alt: String, caption: String }],
   videoUrl: String,
   tags: [String],
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -16,14 +15,6 @@ const newsletterSchema = new mongoose.Schema({
   publishDate: Date,
   views: { type: Number, default: 0 },
   featured: { type: Boolean, default: false },
-  emailSent: { type: Boolean, default: false },
-  emailSentDate: Date,
-  subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Subscriber' }],
-  seo: {
-    metaTitle: String,
-    metaDescription: String,
-    metaKeywords: [String]
-  }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 // Indexes

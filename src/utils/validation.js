@@ -42,24 +42,14 @@ const validateNewsletter = (data, isUpdate = false) => {
   const schema = Joi.object({
     title: Joi.string().min(5).max(200).required().trim(),
     content: Joi.string().min(10).required(),
+    author: Joi.string().required(),
     excerpt: Joi.string().max(500).trim(),
     type: Joi.string().valid('photos', 'press', 'videos', 'general').default('general'),
     featuredImage: Joi.string().uri(),
-    gallery: Joi.array().items(Joi.object({
-      url: Joi.string().uri().required(),
-      alt: Joi.string().trim(),
-      caption: Joi.string().trim()
-    })),
     videoUrl: Joi.string().uri(),
     tags: Joi.array().items(Joi.string().trim()),
     status: Joi.string().valid('draft', 'published', 'archived').default('draft'),
-    publishDate: Joi.date(),
     featured: Joi.boolean().default(false),
-    seo: Joi.object({
-      metaTitle: Joi.string().max(60).trim(),
-      metaDescription: Joi.string().max(160).trim(),
-      metaKeywords: Joi.array().items(Joi.string().trim())
-    })
   });
 
   return schema.validate(data, { allowUnknown: isUpdate });

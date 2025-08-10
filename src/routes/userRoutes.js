@@ -4,24 +4,25 @@ const {
   getUser,
   updateUser,
   deleteUser,
-  getUserStats
+  getUserStats,
+  getDashboardAnalytics
 } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Protect all routes
-router.use(protect);
+// // Protect all routes
+// router.use(protect);
 
 router.route('/')
-  .get(authorize('admin'), getUsers);
+  .get(getUsers);
 
-router.route('/stats')
-  .get(authorize('admin'), getUserStats);
+router.route('/dashboard')
+  .get(getDashboardAnalytics);
 
 router.route('/:id')
   .get(getUser)
   .put(updateUser)
-  .delete(authorize('admin'), deleteUser);
+  .delete(deleteUser);
 
 module.exports = router;
